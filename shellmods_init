@@ -1,5 +1,5 @@
-for module in $SHELLMODS_PATH/enabled/*/; do
-    if [[ -f "$module/init" ]]; then
-        source "$module/init"
+for module in $SHELLMODS_HOME/enabled/*; do
+    if [[ -f "$module" ]]; then
+        source "$module"
     fi
 done

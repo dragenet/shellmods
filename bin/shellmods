@@ -1,0 +1,83 @@
+#!/bin/zsh
+
+if [[ -z "$SHELLMODS_HOME" ]]; then
+    echo "SHELLMODS_HOME is not set" >&2
+    return 1 2>/dev/null || exit 1
+fi
+
+__shellmods_modules_dir="$SHELLMODS_HOME/modules"
+__shellmods_enabled_dir="$SHELLMODS_HOME/enabled"
+
+__shellmods_usage() {
+    echo "Usage: shellmods <enable|disable> <module> [module...]"
+    echo ""
+    echo "Commands:"
+    echo "  enable   Enable one or more modules by linking them into enabled/"
+    echo "  disable  Disable one or more modules by removing their links from enabled/"
+    echo ""
+    echo "Available modules:"
+    for mod in "$__shellmods_modules_dir"/*/; do
+        local name="${mod:h:t}"
+        if [[ -f "$__shellmods_enabled_dir/$name" ]]; then
+            echo "  $name (enabled)"
+        else
+            echo "  $name"
+        fi
+    done
+}
+
+__shellmods_enable() {
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: shellmods enable <module> [module...]" >&2
+        return 1
+    fi
+    local changed=0
+    for name in "$@"; do
+        if [[ ! -d "$__shellmods_modules_dir/$name" ]]; then
+            echo "Module '$name' not found in $__shellmods_modules_dir" >&2
+            continue
+        fi
+        if [[ ! -f "$__shellmods_modules_dir/$name/init" ]]; then
+            echo "Module '$name' has no init file" >&2
+            continue
+        fi
+        if [[ -f "$__shellmods_enabled_dir/$name" ]]; then
+            echo "Module '$name' is already enabled"
+            continue
+        fi
+        ln -s "$__shellmods_modules_dir/$name/init" "$__shellmods_enabled_dir/$name"
+        echo "Enabled module '$name'"
+        changed=1
+    done
+    if [[ $changed -eq 1 ]]; then
+        source "$HOME/.zshrc"
+        echo "Run 'source ~/.zshrc' in other open shells to sync changes"
+    fi
+}
+
+__shellmods_disable() {
+    if [[ $# -eq 0 ]]; then
+        echo "Usage: shellmods disable <module> [module...]" >&2
+        return 1
+    fi
+    local changed=0
+    for name in "$@"; do
+        if [[ ! -f "$__shellmods_enabled_dir/$name" ]]; then
+            echo "Module '$name' is not enabled" >&2
+            continue
+        fi
+        rm "$__shellmods_enabled_dir/$name"
+        echo "Disabled module '$name'"
+        changed=1
+    done
+    if [[ $changed -eq 1 ]]; then
+        source "$HOME/.zshrc"
+        echo "Run 'source ~/.zshrc' in other open shells to sync changes"
+    fi
+}
+
+case "$1" in
+    enable)  shift; __shellmods_enable "$@" ;;
+    disable) shift; __shellmods_disable "$@" ;;
+    *)       __shellmods_usage ;;
+esac

@@ -1,0 +1,28 @@
+#!/bin/zsh
+set -e
+
+SHELLMODS_HOME="${0:a:h}"
+ZSHRC="$HOME/.zshrc"
+SNIPPET="export SHELLMODS_HOME=\"$SHELLMODS_HOME\"
+source \"$SHELLMODS_HOME/shellmods_init\""
+
+if [[ ! -d "$SHELLMODS_HOME/enabled" ]]; then
+    mkdir "$SHELLMODS_HOME/enabled"
+    echo "Created $SHELLMODS_HOME/enabled"
+fi
+
+if grep -qF 'SHELLMODS_HOME' "$ZSHRC" 2>/dev/null; then
+    echo "shellmods already configured in $ZSHRC"
+    exit 0
+fi
+
+printf '\n%s\n' "$SNIPPET" >> "$ZSHRC"
+echo "Added shellmods init to $ZSHRC"
+
+if [[ ! -f "$SHELLMODS_HOME/enabled/shellmods-cli" ]]; then
+    ln -s "$SHELLMODS_HOME/modules/shellmods-cli/init" "$SHELLMODS_HOME/enabled/shellmods-cli"
+    echo "Enabled shellmods-cli module"
+fi
+
+source "$ZSHRC"
+echo "Run 'source ~/.zshrc' in other open shells to sync changes"

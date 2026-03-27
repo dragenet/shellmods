@@ -1,0 +1,7 @@
+shellmods() {
+    source "$SHELLMODS_HOME/bin/shellmods" "$@"
+}
+
+alias shm='shellmods'
+alias shme='shellmods enable'
+alias shmd='shellmods disable'
