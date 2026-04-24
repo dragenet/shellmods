@@ -5,7 +5,7 @@ Enables Docker CLI tab completions in zsh.
 ## What It Does
 
 - Adds `~/.docker/completions` to the zsh `fpath`.
-- Initializes the zsh completion system (`compinit`).
+- Completion initialization (`compinit`) is handled centrally by the `oh-my-zsh` module.
 
 ## Prerequisites
 

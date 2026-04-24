@@ -1,1 +1,10 @@
-eval "$(rbenv init - zsh)"
+_rbenv_load() {
+  unfunction rbenv ruby gem bundle irb 2>/dev/null
+  eval "$(command rbenv init - zsh)"
+}
+
+rbenv()  { _rbenv_load; rbenv "$@"; }
+ruby()   { _rbenv_load; ruby "$@"; }
+gem()    { _rbenv_load; gem "$@"; }
+bundle() { _rbenv_load; bundle "$@"; }
+irb()    { _rbenv_load; irb "$@"; }

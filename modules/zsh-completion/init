@@ -1,0 +1,14 @@
+typeset -U fpath
+
+autoload -Uz compinit
+
+if (( $+functions[zsh-defer] )); then
+  zsh-defer compinit -C
+  zsh-defer -c 'if [[ -f "${ZDOTDIR:-$HOME}/.zcompdump" ]]; then zcompile "${ZDOTDIR:-$HOME}/.zcompdump"; fi'
+else
+  if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+    compinit
+  else
+    compinit -C
+  fi
+fi

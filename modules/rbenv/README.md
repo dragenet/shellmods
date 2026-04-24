@@ -1,10 +1,12 @@
 # rbenv
 
-Initializes rbenv for Ruby version management.
+Initializes rbenv for Ruby version management using lazy loading.
 
 ## What It Does
 
-- Evaluates `rbenv init` to set up shims and autocompletion for zsh.
+- Defines lightweight wrapper functions for `rbenv`, `ruby`, `gem`, `bundle`, and `irb`.
+- On first invocation of any of these commands, runs `rbenv init` to set up shims and autocompletion, then runs the original command.
+- This lazy-loading approach avoids the startup cost of `rbenv init` on every shell launch.
 
 ## Prerequisites
 
