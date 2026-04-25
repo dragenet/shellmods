@@ -9,20 +9,31 @@ __shellmods_modules_dir="$SHELLMODS_HOME/modules"
 __shellmods_enabled_dir="$SHELLMODS_HOME/enabled"
 
 __shellmods_usage() {
-    echo "Usage: shellmods <enable|disable> <module> [module...]"
+    echo "Usage: shellmods <command> [args...]"
     echo ""
     echo "Commands:"
-    echo "  enable   Enable one or more modules by linking them into enabled/"
-    echo "  disable  Disable one or more modules by removing their links from enabled/"
-    echo ""
-    echo "Available modules:"
+    echo "  list      (l, ls)                    List all available modules"
+    echo "  enabled                              List currently enabled modules"
+    echo "  enable    (e)  <module> [module...]  Enable one or more modules"
+    echo "  disable   (d)  <module> [module...]  Disable one or more modules"
+    echo "  help                                 Show this help message"
+}
+
+__shellmods_list() {
     for mod in "$__shellmods_modules_dir"/*/; do
-        local name="${mod:h:t}"
+        local name="${${mod%/}:t}"
         if [[ -f "$__shellmods_enabled_dir/$name" ]]; then
             echo "  $name (enabled)"
         else
             echo "  $name"
         fi
+    done
+}
+
+__shellmods_enabled() {
+    for link in "$__shellmods_enabled_dir"/*; do
+        [[ -f "$link" ]] || continue
+        echo "  ${link:t}"
     done
 }
 
@@ -77,7 +88,10 @@ __shellmods_disable() {
 }
 
 case "$1" in
-    enable)  shift; __shellmods_enable "$@" ;;
-    disable) shift; __shellmods_disable "$@" ;;
-    *)       __shellmods_usage ;;
+    enable|e)       shift; __shellmods_enable "$@" ;;
+    disable|d)      shift; __shellmods_disable "$@" ;;
+    list|l|ls)      __shellmods_list ;;
+    enabled)        __shellmods_enabled ;;
+    help|--help|-h) __shellmods_usage ;;
+    *)              __shellmods_usage ;;
 esac
