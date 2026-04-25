@@ -15,7 +15,9 @@ __shellmods_usage() {
     echo "  list      (l, ls)                    List all available modules"
     echo "  enabled                              List currently enabled modules"
     echo "  enable    (e)  <module> [module...]  Enable one or more modules"
+    echo "  enable    (e)  --all                 Enable all available modules"
     echo "  disable   (d)  <module> [module...]  Disable one or more modules"
+    echo "  disable   (d)  --all                 Disable all enabled modules"
     echo "  help                                 Show this help message"
 }
 
@@ -39,8 +41,14 @@ __shellmods_enabled() {
 
 __shellmods_enable() {
     if [[ $# -eq 0 ]]; then
-        echo "Usage: shellmods enable <module> [module...]" >&2
+        echo "Usage: shellmods enable <module> [module...] | --all" >&2
         return 1
+    fi
+    if [[ "$1" == "--all" ]]; then
+        set --
+        for mod in "$__shellmods_modules_dir"/*/; do
+            set -- "$@" "${${mod%/}:t}"
+        done
     fi
     local changed=0
     for name in "$@"; do
@@ -68,8 +76,15 @@ __shellmods_enable() {
 
 __shellmods_disable() {
     if [[ $# -eq 0 ]]; then
-        echo "Usage: shellmods disable <module> [module...]" >&2
+        echo "Usage: shellmods disable <module> [module...] | --all" >&2
         return 1
+    fi
+    if [[ "$1" == "--all" ]]; then
+        set --
+        for link in "$__shellmods_enabled_dir"/*; do
+            [[ -f "$link" ]] || continue
+            set -- "$@" "${link:t}"
+        done
     fi
     local changed=0
     for name in "$@"; do

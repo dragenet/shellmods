@@ -1,75 +1,68 @@
-# zsh-config
+# ShellMods
 
-Modularized zsh configuration built on top of [Oh My Zsh](https://ohmyz.sh/).
+Modular zsh configuration for macOS. Instead of a growing `.zshrc`, each piece of shell config lives in its own module — a self-contained directory with an `init` entrypoint. Modules are activated by symlinking them into `enabled/`, so you can toggle features per machine without touching config files.
 
-Each piece of shell configuration lives in its own module -- a self-contained directory with an `init` entrypoint. Modules are enabled by symlinking them, making it easy to toggle features per machine without editing config files.
+## Setup
 
-## Structure
+1. Clone the repo:
+   ```sh
+   git clone https://github.com/dragenet/shellmods.git ~/.shellmods
+   ```
 
+2. Run bootstrap:
+   ```sh
+   ~/.shellmods/bootstrap
+   ```
+   This creates `enabled/`, appends the init snippet to `~/.zshrc`, and enables the `shellmods` CLI.
+
+3. Enable the modules you need:
+   ```sh
+   shellmods enable homebrew nvm auto-nvm git-aliases
+   ```
+
+4. Restart your shell or run `source ~/.zshrc`.
+
+## Managing Modules
+
+```sh
+shellmods list              # show all available modules
+shellmods enabled           # show currently enabled modules
+shellmods enable <module>   # enable one or more modules
+shellmods disable <module>  # disable one or more modules
+shellmods enable --all      # enable everything
+shellmods disable --all     # disable everything
 ```
-shellmods/
-  bootstrap                  # Sets up shellmods in ~/.zshrc and creates enabled/
-  shellmods_init             # Sources init from each enabled module
-  modules/                   # All modules (see below)
-```
 
-At runtime, `SHELLMODS_HOME` points to the `shellmods/` directory. The `enabled/` directory (not tracked) contains symlinks to the modules you want active.
+Shorthand: `shm` = `shellmods`, `shme` = enable, `shmd` = disable.
 
 ## Available Modules
 
 | Module | Description |
 |--------|-------------|
 | `alias-yarn` | Shorthand aliases for Yarn commands |
-| `android-home` | Android SDK environment setup |
-| `auto-nvm` | Auto-switch Node.js versions on `cd` via `.nvmrc` |
-| `bun` | Bun runtime and completions |
+| `android-home` | Android SDK environment (`ANDROID_HOME`, `adb`, emulator, etc.) |
+| `auto-nvm` | Auto-switches Node.js version on `cd` via `.nvmrc` (requires `nvm`) |
+| `bun` | Bun runtime environment |
+| `defer` | `zsh-defer` for deferred initialization — load before modules that use it |
 | `docker-completions` | Docker CLI tab completions |
-| `homebrew` | Homebrew shell environment |
-| `java-home` | JAVA_HOME for Azul Zulu JDK 17 |
-| `local-bin` | Adds `~/.local/bin` to PATH |
-| `nano-default-editor` | Sets nano as default EDITOR |
-| `nvm` | Node Version Manager initialization |
-| `oh-my-zsh` | Oh My Zsh framework, theme, and plugins |
-| `pg-client` | PostgreSQL client tools (libpq) |
-| `rbenv` | Ruby version management via rbenv |
-| `vim-default-editor` | Sets vim as default EDITOR |
-| `windsurf` | Windsurf (Codeium) editor CLI |
+| `git-aliases` | Comprehensive git aliases and helpers (extracted from Oh My Zsh) |
+| `homebrew` | Homebrew shell environment (hard-coded output for fast startup) |
+| `inteli-history` | Up/down arrow searches history by current input prefix |
+| `java-home` | Sets `JAVA_HOME` to Azul Zulu JDK 17 |
+| `lazygit` | `lg` alias for lazygit |
+| `local-bin` | Adds `~/.local/bin` to `$PATH` |
+| `nano-default-editor` | Sets `nano` as `$EDITOR` |
+| `nvm` | Lazy-loads Node Version Manager (avoids ~300ms startup cost) |
+| `pg-client` | PostgreSQL client tools via Homebrew libpq |
+| `rbenv` | Lazy-loads rbenv for Ruby version management |
+| `robbyrussell-theme` | Classic robbyrussell prompt with git status indicators |
+| `shellmods-cli` | The `shellmods` management CLI (enabled automatically by bootstrap) |
+| `vim-default-editor` | Sets `vim` as `$EDITOR` |
+| `windsurf` | Adds Windsurf (Codeium) editor CLI to `$PATH` |
+| `zsh-completion` | Centralized `compinit` with deferred loading and dump caching |
 
-See each module's `README.md` for details, prerequisites, and configuration options.
+Each module has its own `README.md` with prerequisites and configuration notes.
 
-## Setup
+## Contributing
 
-1. Clone the repo:
-   ```sh
-   git clone <repo-url> ~/.zsh-config
-   ```
-
-2. Run the bootstrap script:
-   ```sh
-   ~/.zsh-config/shellmods/bootstrap
-   ```
-
-   This creates the `enabled/` directory and appends the shellmods init to `~/.zshrc`.
-
-3. Enable the modules you need:
-   ```sh
-   ln -s $SHELLMODS_HOME/modules/oh-my-zsh $SHELLMODS_HOME/enabled/oh-my-zsh
-   ln -s $SHELLMODS_HOME/modules/homebrew $SHELLMODS_HOME/enabled/homebrew
-   # ... add more as needed
-   ```
-
-4. Restart your shell or run `source ~/.zshrc`.
-
-## Adding a New Module
-
-```sh
-mkdir shellmods/modules/my-module
-# Create init with your shell config
-vi shellmods/modules/my-module/init
-# Document it
-vi shellmods/modules/my-module/README.md
-# Enable it
-ln -s $SHELLMODS_HOME/modules/my-module $SHELLMODS_HOME/enabled/my-module
-```
-
-See [AGENTS.md](AGENTS.md) for detailed conventions and the multi-file module pattern.
+See [AGENTS.md](AGENTS.md) for module conventions, the multi-file module pattern, and how to add a new module.
