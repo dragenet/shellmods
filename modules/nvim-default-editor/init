@@ -6,3 +6,5 @@ else
 fi
 
 export VISUAL="$EDITOR"
+
+alias vim='nvim'
