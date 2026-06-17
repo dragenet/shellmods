@@ -1,0 +1,6 @@
+local -a kube_configs
+kube_configs=(${HOME}/.kube/config(N) ${HOME}/.kube/config.d/*/config(N))
+
+(( ${#kube_configs} )) && export KUBECONFIG="${(j.:.)kube_configs}"
+
+unset kube_configs
